@@ -3,7 +3,7 @@
 AC_PREREQ(2.59)
 AC_INIT([Calindora], [0.0.1])
 AM_INIT_AUTOMAKE(1.8)
-AC_CONFIG_SRCDIR([src/calindora.cpp])
+AC_CONFIG_SRCDIR([src/Calindora.cpp])
 AM_CONFIG_HEADER([config.h])
 
 AM_OPTIONS_WXCONFIG
