@@ -28,16 +28,26 @@
 #ifndef CALINDORA_H
 #define CALINDORA_H
 
-#include "wx/wx.h"
-#include "config.h"
+#include <wx/app.h>
+#include <wx/log.h>
 
-#include "ClientFrame.h"
+class Core;
 
 class Calindora : public wxApp
 {
 	public:
 		virtual bool OnInit();
+
+	private:
+		Core *_core;
 		
+		wxLogChain *_logChain;
+};
+
+DECLARE_APP(Calindora)
+
+/*
+	public:
 		// Configuration access and setting commands. Anything that wants to set preferences is able to.
 		// This allows the GUI, for example, to provide an interface for setting configuration values.
 		// TODO:
@@ -50,14 +60,6 @@ class Calindora : public wxApp
 		// -- Add options for configuration detail level, allowing novices to suppress less-used options.
 		//wxString getPreference(const wxString& section, const wxString& item);
 		//void setPreference(const wxString& section, const wxString& item, const wxString& data);
-		
-	private:
-		ClientFrame *_frame;
-		Core *_core;
-		
-		wxLogChain *_logChain;
-};
-
-DECLARE_APP(Calindora)
+*/
 
 #endif

@@ -28,33 +28,43 @@
 #ifndef SERVER_H
 #define SERVER_H
 
+#include <wx/panel.h>
+#include <wx/sizer.h>
+#include <wx/textctrl.h>
+#include <wx/window.h>
+
 class Core;
-
-#include <string>
-
-#include "wx/wx.h"
-
-#include "wx/event.h"
-#include "wx/socket.h"
-
-#include "Core.h"
-#include "ServerView.h"
 
 class Server : public wxPanel
 {
 	public:
-		Server(wxWindow *parent);
+		Server(wxWindow *parent, Core *core);
 		~Server();
 		
+	private:
+		Core *_core;
+		
+		wxTextCtrl *_outputControl;
+		wxTextCtrl *_inputControl;
+		wxSizer *_sizer;
+};
+
+/*
+class Core;
+
+#include <string>
+
+class Server : public wxPanel
+{
+	public:
 		bool operator== (const Server& right) const;
 		
 		void connect(wxIPaddress *server);
 		void disconnect();
-		void setView(ServerView *serverView);
 		void onSocketEvent(wxSocketEvent& event);
 		
 		// Called whenever an associated ServerView receives a new input line.
-		void onInput(const wxString& input);
+		void OnInput(wxCommandEvent& event);
 		void rawCommand(const wxString& input);
 		
 	private:
@@ -67,9 +77,6 @@ class Server : public wxPanel
 		std::string _inputBuffer;		
 		int _status;
 		static int nextID;
-		
-		ServerView *_view;
-		Core *_core;
 		
 		int _id;
 		
@@ -87,10 +94,7 @@ class Server : public wxPanel
 			
 			CONTROL_TEXT_INPUT
 		};
-		
-		wxTextCtrl *_textControl;
-		wxTextCtrl *_inputControl;
-		wxSizer *_sizer;
 };
+*/
 
 #endif

@@ -25,24 +25,26 @@
 // For full license details, see COPYING.
 //-----------------------------------------------------------------------------
 
+#include "Core.h"
+
 #include "Calindora.h"
 
 IMPLEMENT_APP(Calindora)
 
 bool Calindora::OnInit()
 {
-	// Adjust logging to output to cerr, so debug messages are readily available.
-	_logChain = new wxLogChain(new wxLogStream());
+	// Adjust the logging features of wxWidgets to output to stderr, as well.
+	_logChain = new wxLogChain(new wxLogStderr());
 	
+	// Create a core object.
 	_core = new Core();
-	_frame = new ClientFrame(_core);
 	
+	// Create an initial server context.
 	_core->createServer();
 	
-	_frame->Show(TRUE);
-	SetTopWindow(_frame);
-	
-	// Create a new server
+	// Make the core visible.
+	_core->Show(true);
+	SetTopWindow(_core);
 	
 	return true;
 }

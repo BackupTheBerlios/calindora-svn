@@ -25,21 +25,49 @@
 // For full license details, see COPYING.
 //-----------------------------------------------------------------------------
 
+#include <wx/wx.h>
+
+#include "Core.h"
+
+#include "Server.h"
+
+Server::Server(wxWindow *parent, Core *core) : wxPanel(parent)
+{
+	_core = core;
+	
+	_outputControl = new wxTextCtrl(this, -1, _(""), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_RICH | wxTE_READONLY);
+	_inputControl = new wxTextCtrl(this, -1, _(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+	
+	_sizer = new wxBoxSizer(wxVERTICAL);
+	
+	this->SetSizer(_sizer);
+	
+	_sizer->Add(_outputControl, 1, wxEXPAND);
+	_sizer->Add(_inputControl, 0, wxEXPAND);
+}
+
+Server::~Server()
+{
+	
+}
+
+/*
 #include <iostream>
 
 #include "Server.h"
 
+#include "Core.h"
+
 // wxWidgets event table
 BEGIN_EVENT_TABLE(Server, wxEvtHandler)
 	EVT_SOCKET(SOCKET_ID, Server::onSocketEvent)
-	EVT_TEXT_ENTER(CONTROL_TEXT_INPUT, ServerPanel::OnInput)
+	EVT_TEXT_ENTER(CONTROL_TEXT_INPUT, Server::OnInput)
 END_EVENT_TABLE()
 
 int Server::nextID = 0;
 
-Server::Server(Core *core)
+Server::Server(wxWindow *parent, Core *core) : wxPanel(parent)
 {
-	_core = core;
 	_id = Server::nextID;
 	Server::nextID++;
 	
@@ -51,18 +79,6 @@ Server::Server(Core *core)
 	
 	_status = STATUS_DISCONNECTED;
 	_currentServer = NULL;
-	
-	_textControl = new wxTextCtrl(this, -1, _(""), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_RICH); // | wxTE_READONLY);
-	
-	_inputControl = new wxTextCtrl(this, CONTROL_TEXT_INPUT, _(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-	
-	_sizer = new wxBoxSizer(wxVERTICAL);
-
-	this->SetAutoLayout(true);
-	this->SetSizer(_sizer);
-
-	_sizer->Add(_textControl, 1, wxGROW);
-	_sizer->Add(_inputControl, 0, wxGROW);
 }
 
 Server::~Server()
@@ -81,21 +97,21 @@ void Server::connect(wxIPaddress *server)
 	_status = STATUS_CONNECTING;
 	_socket->Connect(*_currentServer, false);
 	
-	_view->onServerMessage(_("Connecting to server..."));
+	//_view->onServerMessage(_("Connecting to server..."));
 	
 	long timeout;
-	if (!(_core->getPreference(_("Server"), _("ConnectionTimeout")).ToLong(&timeout, 10)))
-	{
+	//if (!(_core->getPreference(_("Server"), _("ConnectionTimeout")).ToLong(&timeout, 10)))
+	//{
 		timeout = 10;
-	}
+	//}
 	if (_socket->WaitOnConnect(timeout) == true && _socket->IsConnected())
 	{
-		_view->onServerMessage(_("Successful connection!"));
+		//_view->onServerMessage(_("Successful connection!"));
 		_status = STATUS_CONNECTED;
 	}
 	else
 	{
-		_view->onServerMessage(_("Failed to connect!"));
+		//_view->onServerMessage(_("Failed to connect!"));
 		_status = STATUS_DISCONNECTED;
 	}
 }
@@ -103,11 +119,6 @@ void Server::connect(wxIPaddress *server)
 void Server::disconnect()
 {
 	_socket->Close();
-}
-
-void Server::setView(ServerView *view)
-{
-	_view = view;
 }
 
 void Server::onSocketEvent(wxSocketEvent& event)
@@ -121,7 +132,7 @@ void Server::onSocketEvent(wxSocketEvent& event)
 		case wxSOCKET_LOST:
 			if (_status != STATUS_CONNECTING)
 			{
-				_view->onServerMessage(_("Connection lost."));
+				//_view->onServerMessage(_("Connection lost."));
 			}
 			_status = STATUS_DISCONNECTED;
 			break;
@@ -137,7 +148,7 @@ void Server::onSocketEvent(wxSocketEvent& event)
 				{
 					wxSocketError error = _socket->LastError();
 					
-					_view->onServerMessage(_("***** A socket I/O error has occured."));
+					//_view->onServerMessage(_("***** A socket I/O error has occured."));
 				}
 				
 				_inputBuffer.append(readBuffer, _socket->LastCount());
@@ -166,7 +177,7 @@ void Server::onSocketEvent(wxSocketEvent& event)
 						message = new wxString(input.c_str(), wxConvISO8859_1);
 						//delete conv;
 					}
-					_view->onServerMessage(*message);
+					//_view->onServerMessage(*message);
 					delete message;
 					
 					// Alter the input buffer to remove this line.
@@ -185,7 +196,7 @@ void Server::onSocketEvent(wxSocketEvent& event)
 	}
 }
 
-void Server::onInput(const wxString& input)
+void Server::OnInput(wxCommandEvent& event)
 {
 	wxString text = _inputControl->GetLineText(0);
 	
@@ -210,7 +221,7 @@ void Server::rawCommand(const wxString& input)
 		{
 			wxSocketError error = _socket->LastError();
 			
-			_view->onServerMessage(_("***** A socket I/O error has occured."));
+		//	_view->onServerMessage(_("***** A socket I/O error has occured."));
 		}
 		
 		// Finish the write with a newline. May be more practical to append to the buffer and only write once.
@@ -219,12 +230,12 @@ void Server::rawCommand(const wxString& input)
 		{
 			wxSocketError error = _socket->LastError();
 			
-			_view->onServerMessage(_("***** A socket I/O error has occured."));
+			//_view->onServerMessage(_("***** A socket I/O error has occured."));
 		}
 	}
 	else
 	{
-		_view->onServerMessage(_("Not connected to a server."));
+	//	_view->onServerMessage(_("Not connected to a server."));
 	}
 }
 
@@ -239,3 +250,4 @@ bool Server::operator== (const Server& right) const
 		return false;
 	}
 }
+*/

@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// ClientFrame.h
+// Core.h
 //
 // Date:		22 Jul 2004
 // Copyright:	Copyright (C) Jason Lynch 2004
@@ -25,48 +25,59 @@
 // For full license details, see doc/COPYING.
 //-----------------------------------------------------------------------------
 
-#ifndef CLIENTFRAME_H
-#define CLIENTFRAME_H
+#ifndef CORE_H
+#define CORE_H
 
 #include <list>
 
-#include "wx/wx.h"
-#include "wx/notebook.h"
+#include <wx/event.h>
+#include <wx/frame.h>
+#include <wx/menu.h>
+#include <wx/notebook.h>
+#include <wx/sizer.h>
 
-#include "config.h"
+class Server;
 
-#include "ServerPanel.h"
-
-class ClientFrame : public wxFrame
+class Core : public wxFrame
 {
 	public:
-		ClientFrame();
-		~ClientFrame();
+		Core();
+		~Core();
 		
+		// wxWidgets event handlers
 		void OnMenuFileExit(wxCommandEvent &event);
 		
-		// Triggered on input. Indicates the context of the input. For now, just servers, but later
-		// a more elaborate solution will be needed to handle channels or other windows as well.
-		void input(const wxString& input, Server *server);		
-
+		// Other various methods.
+		Server* createServer();
+		
 	protected:
 		DECLARE_EVENT_TABLE()
-
+		
 	private:
-		wxNotebook *_notebook;
-		wxNotebookSizer *_notebookSizer;
-
+		// Menu-related items.
 		wxMenuBar *_menuBar;
 		wxMenu *_fileMenu;
 		
-		std::list<Server*> *_serverList;		
+		wxNotebook *_notebook;
+		wxNotebookSizer *_notebookSizer;
 		
-		void createServer();
+		std::list<Server*> *_serverList;
 		
+		// Various constants
 		enum
 		{
 			MENU_FILE_EXIT
 		};
 };
+
+/*
+class Core : public wxFrame
+{
+	public:
+		// Triggered on input. Indicates the context of the input. For now, just servers, but later
+		// a more elaborate solution will be needed to handle channels or other windows as well.
+		void input(const wxString& input, Server *server);		
+};
+*/
 
 #endif
