@@ -32,6 +32,7 @@
 // wxWidgets event table
 BEGIN_EVENT_TABLE(Server, wxEvtHandler)
 	EVT_SOCKET(SOCKET_ID, Server::onSocketEvent)
+	EVT_TEXT_ENTER(CONTROL_TEXT_INPUT, ServerPanel::OnInput)
 END_EVENT_TABLE()
 
 int Server::nextID = 0;
@@ -50,6 +51,18 @@ Server::Server(Core *core)
 	
 	_status = STATUS_DISCONNECTED;
 	_currentServer = NULL;
+	
+	_textControl = new wxTextCtrl(this, -1, _(""), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_RICH); // | wxTE_READONLY);
+	
+	_inputControl = new wxTextCtrl(this, CONTROL_TEXT_INPUT, _(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+	
+	_sizer = new wxBoxSizer(wxVERTICAL);
+
+	this->SetAutoLayout(true);
+	this->SetSizer(_sizer);
+
+	_sizer->Add(_textControl, 1, wxGROW);
+	_sizer->Add(_inputControl, 0, wxGROW);
 }
 
 Server::~Server()
@@ -174,10 +187,12 @@ void Server::onSocketEvent(wxSocketEvent& event)
 
 void Server::onInput(const wxString& input)
 {
-	_view->onServerMessage(input);
+	wxString text = _inputControl->GetLineText(0);
+	
+	_inputControl->Clear();	
 	
 	// We probably don't have any processing of our own, so we'll delegate it to the core.
-	_core->input(input, this);
+	_core->input(text, this);
 }
 
 void Server::rawCommand(const wxString& input)

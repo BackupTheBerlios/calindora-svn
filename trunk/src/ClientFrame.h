@@ -6,7 +6,7 @@
 // Website:		http://calindora.aexoden.com
 // Author:		Jason Lynch (aexoden@aexoden.com)
 //-----------------------------------------------------------------------------
-// $Id: clientframe.h 3 2004-05-25 23:04:18Z Jason Lynch $
+// $Id$
 //-----------------------------------------------------------------------------
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -35,22 +35,19 @@
 
 #include "config.h"
 
-#include "Core.h"
-#include "CoreView.h"
-
 #include "ServerPanel.h"
 
-class ClientFrame : public wxFrame, public CoreView
+class ClientFrame : public wxFrame
 {
 	public:
-		ClientFrame(Core *core);
+		ClientFrame();
 		~ClientFrame();
 		
-		// CoreView imposed requirements.
-		// Don't need to directly include Server.h
-		void onCoreNewServer(Server *server);
-
 		void OnMenuFileExit(wxCommandEvent &event);
+		
+		// Triggered on input. Indicates the context of the input. For now, just servers, but later
+		// a more elaborate solution will be needed to handle channels or other windows as well.
+		void input(const wxString& input, Server *server);		
 
 	protected:
 		DECLARE_EVENT_TABLE()
@@ -62,8 +59,10 @@ class ClientFrame : public wxFrame, public CoreView
 		wxMenuBar *_menuBar;
 		wxMenu *_fileMenu;
 		
-		Core *_core;
-
+		std::list<Server*> *_serverList;		
+		
+		void createServer();
+		
 		enum
 		{
 			MENU_FILE_EXIT

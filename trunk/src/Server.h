@@ -40,10 +40,10 @@ class Core;
 #include "Core.h"
 #include "ServerView.h"
 
-class Server : public wxEvtHandler
+class Server : public wxPanel
 {
 	public:
-		Server(Core *core);
+		Server(wxWindow *parent);
 		~Server();
 		
 		bool operator== (const Server& right) const;
@@ -83,8 +83,14 @@ class Server : public wxEvtHandler
 			
 			STATUS_DISCONNECTED,
 			STATUS_CONNECTING,
-			STATUS_CONNECTED
+			STATUS_CONNECTED,
+			
+			CONTROL_TEXT_INPUT
 		};
+		
+		wxTextCtrl *_textControl;
+		wxTextCtrl *_inputControl;
+		wxSizer *_sizer;
 };
 
 #endif

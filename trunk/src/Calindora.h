@@ -31,8 +31,6 @@
 #include "wx/wx.h"
 #include "config.h"
 
-#include "Core.h"
-
 #include "ClientFrame.h"
 
 class Calindora : public wxApp
@@ -40,9 +38,24 @@ class Calindora : public wxApp
 	public:
 		virtual bool OnInit();
 		
+		// Configuration access and setting commands. Anything that wants to set preferences is able to.
+		// This allows the GUI, for example, to provide an interface for setting configuration values.
+		// TODO:
+		// -- Add support for per-server and per-channel configurations.
+		// -- Develop a good configuration hierarchy.
+		// -- Support XML based configuration storage.
+		// -- Provide an interface for working with the configuration hierarchy. For example, different kinds of
+		//    options (yes/no, textbox) and so on, each with defined values. This could allow a GUI to generate
+		//    a configuration dialog on the fly, without needing to know about each option.
+		// -- Add options for configuration detail level, allowing novices to suppress less-used options.
+		//wxString getPreference(const wxString& section, const wxString& item);
+		//void setPreference(const wxString& section, const wxString& item, const wxString& data);
+		
 	private:
 		ClientFrame *_frame;
 		Core *_core;
+		
+		wxLogChain *_logChain;
 };
 
 DECLARE_APP(Calindora)

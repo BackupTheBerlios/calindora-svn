@@ -31,6 +31,9 @@ IMPLEMENT_APP(Calindora)
 
 bool Calindora::OnInit()
 {
+	// Adjust logging to output to cerr, so debug messages are readily available.
+	_logChain = new wxLogChain(new wxLogStream());
+	
 	_core = new Core();
 	_frame = new ClientFrame(_core);
 	
@@ -43,3 +46,30 @@ bool Calindora::OnInit()
 	
 	return true;
 }
+
+/*
+wxString Core::getPreference(const wxString& section, const wxString& item)
+{
+	if (section == _("General"))
+	{
+		if (item == _("CommandPrefix"))
+		{
+				return _("/");
+		}
+	}
+	else if (section == _("Server"))
+	{
+		if (item == _("ConnectionTimeout"))
+		{
+			return _("10"); 
+		}
+	}
+	
+	return _("");
+}
+
+void Core::setPreference(const wxString& section, const wxString& item, const wxString& data)
+{
+	// Do nothing yet
+}
+*/
