@@ -48,6 +48,9 @@ class Server : public wxPanel
 		void OnInput(wxCommandEvent& event);
 		void OnSocketEvent(wxSocketEvent& event);
 		
+		// Commands
+		void rawCommand(const wxString& input);
+		
 		// Socket related methods
 		bool checkSocketError();
 		void connect(wxIPaddress *address);
@@ -83,20 +86,9 @@ class Server : public wxPanel
 };
 
 /*
-class Core;
-
-#include <string>
-
 class Server : public wxPanel
 {
-	public:
-		bool operator== (const Server& right) const;
-		void rawCommand(const wxString& input);
-		
 	private:
-		// Buffer to hold incoming data until we have a full line.
-		std::string _inputBuffer;		
-		int _status;
 		static int nextID;
 };
 */

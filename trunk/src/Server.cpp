@@ -155,13 +155,93 @@ void Server::OnSocketEvent(wxSocketEvent &event)
 	}
 }
 
+
+void Server::rawCommand(const wxString& input)
+{
+	// If we're not connected to a server, we shouldn't bother sending the command.
+	if (_socketStatus == STATUS_CONNECTED)
+	{
+		// Convert the input to the desired encoding. For now, that's UTF-8.
+		// TODO:
+		// -- Determine the encoding based on a preference.
+		// -- Determine the semantics of mb_str(). We need some way to handle invalid
+		//    characters for a particular encoding.
+		const wxWX2MBbuf buffer = input.mb_str(wxConvUTF8);
+		int byteCount = strlen(buffer);
+		
+		// Write the buffer to the socket and check for an error.
+		_socket->Write(buffer, byteCount);
+		if (!this->checkSocketError())
+		{
+			_socket->Write("\n", 1);
+			this->checkSocketError();
+		}
+	}
+	else
+	{
+		(*_outputControl) << _("Error: Not connected to a server.\n");
+	}
+}
+
 bool Server::checkSocketError()
 {
 	if (_socket->Error())
 	{
 		wxSocketError error = _socket->LastError();
 		
-		(*_outputControl) << _("An unknown socket error has occured.\n");
+		// Based on the error, create an error message.
+		// TODO:
+		// -- The wxSOCKET_WOULDBLOCK error may have a more appropriate solution, depending
+		//    on the exact semantics of when it occurs.
+		wxString errorMessage;
+		switch (error)
+		{
+			case wxSOCKET_NOERROR:
+				errorMessage = _("There was a socket error, but the error code is that of no error. This is probably a bug.");
+				break;
+				
+			case wxSOCKET_INVOP:
+				errorMessage = _("Invalid operation.");
+				break;
+				
+			case wxSOCKET_IOERR:
+				errorMessage = _("I/O error.");
+				break;
+				
+			case wxSOCKET_INVADDR:
+				errorMessage = _("Invalid address.");
+				break;
+				
+			case wxSOCKET_INVSOCK:
+				errorMessage = _("Invalid socket.");
+				break;
+			
+			case wxSOCKET_NOHOST:
+				errorMessage = _("No corresponding host.");
+				break;
+			
+			case wxSOCKET_INVPORT:
+				errorMessage = _("Invalid port.");
+				break;
+			
+			case wxSOCKET_WOULDBLOCK:
+				errorMessage = _("The socket is non-blocking and the operation would block.");
+				break;
+			
+			case wxSOCKET_TIMEDOUT:
+				errorMessage = _("The timeout for this operation expired.");
+				break;
+			
+			case wxSOCKET_MEMERR:
+				errorMessage = _("Memory exhausted.");
+				break;
+				
+			default:
+				errorMessage = _("An unknown error has occured.");
+				break;
+		}
+		
+		(*_outputControl) << _("Socket error: ") << errorMessage << wxT("\n");
 		
 		return true;
 	}
@@ -225,51 +305,5 @@ Server::Server(wxWindow *parent, Core *core) : wxPanel(parent)
 {
 	_id = Server::nextID;
 	Server::nextID++;
-}
-
-
-void Server::rawCommand(const wxString& input)
-{
-	if (_status == STATUS_CONNECTED)
-	{
-		// Convert the input buffer into a UTF-8 multibyte string. More sophisticated character set
-		// handling may eventually be needed.
-		const wxWX2MBbuf buffer = input.mb_str(wxConvUTF8);
-		int byteCount = strlen(buffer);
-		
-		// Write the buffer to the socket and check for an error. Better error handling should be a todo.
-		_socket->Write(buffer, byteCount);
-		if (_socket->Error())
-		{
-			wxSocketError error = _socket->LastError();
-			
-		//	_view->onServerMessage(_("***** A socket I/O error has occured."));
-		}
-		
-		// Finish the write with a newline. May be more practical to append to the buffer and only write once.
-		_socket->Write("\n", 1);
-		if (_socket->Error())
-		{
-			wxSocketError error = _socket->LastError();
-			
-			//_view->onServerMessage(_("***** A socket I/O error has occured."));
-		}
-	}
-	else
-	{
-	//	_view->onServerMessage(_("Not connected to a server."));
-	}
-}
-
-bool Server::operator== (const Server& right) const
-{
-	if (this->_id == right._id)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
 }
 */

@@ -123,40 +123,6 @@ void Core::processInput(const wxString& input, Server *server)
 		// TODO:
 		// -- Send the command directly to the context as a raw command. This means messages typed in a channel
 		//    will go to that channel. Messages typed in a server window will be sent as raw commands.
+		server->rawCommand(input);
 	}
 }
-
-/*
-#include "wx/tokenzr.h"
-#include "wx/regex.h"
-
-void Core::input(const wxString& input, Server *server)
-{
-	// Check for a command.
-	// TODO:
-	// -- May want to detect the prefix as long as only whitespace precedes it.
-	// -- Perhaps make it possible for prefix to be more than a single character.
-	if (input.Left(1) == wxT("/")) // this->getPreference(_("General"), _("CommandPrefix")))
-	{
-		wxArrayString *tokens = new wxArrayString();
-		
-		wxStringTokenizer tokenizer(input, _(" \t"), wxTOKEN_STRTOK);
-		while (tokenizer.HasMoreTokens())
-		{
-			tokens->Add(tokenizer.GetNextToken());
-		}
-
-		wxString command = (*tokens)[0];
-		command = command.Right(command.length() - 1).MakeLower();
-		
-		if (command == _("server"))
-		{
-			wxRegEx reServer(wxT("/server( (-n))?( ([[:alnum:].-]+))?((:| )([0-9]+))?"));
-		}
-		
-		delete tokens;
-	}
-}
-
-
-*/
