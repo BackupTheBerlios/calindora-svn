@@ -1,12 +1,12 @@
 //-----------------------------------------------------------------------------
-// file_template.txt
+// Server.h
 //
-// Date:        17 Jul 2004
+// Date:        19 Jul 2004
 // Copyright:   Copyright (C) Jason Lynch 2004
 // Website:     http://calindora.berlios.de
 // Author:      Jason Lynch (aexoden@aexoden.com)
 //-----------------------------------------------------------------------------
-// $Id: $
+// $Id: Calindora.h 7 2004-07-18 03:58:08Z aexoden $
 //-----------------------------------------------------------------------------
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -24,3 +24,59 @@
 //
 // For full license details, see COPYING.
 //-----------------------------------------------------------------------------
+
+#ifndef SERVER_H
+#define SERVER_H
+
+class Core;
+
+#include "wx/wx.h"
+
+#include "wx/event.h"
+#include "wx/socket.h"
+
+#include "Core.h"
+#include "ServerView.h"
+
+class Server : public wxEvtHandler
+{
+	public:
+		Server(Core *core);
+		~Server();
+		
+		bool operator== (const Server& right) const;
+		
+		void connect(wxIPaddress *server);
+		void disconnect();
+		void setView(ServerView *serverView);
+		void onSocketEvent(wxSocketEvent& event);
+		
+		// Called whenever an associated ServerView receives a new input line.
+		void onInput(const wxString& input);
+		void rawCommand(const wxString& input);
+		
+	private:
+		wxSocketClient *_socket;
+		
+		// Using wxIPaddress to presumably pave the way for future IPV6 support.
+		wxIPaddress *_currentServer;
+		
+		bool _connected;
+		static int nextID;
+		
+		ServerView *_view;
+		Core *_core;
+		
+		int _id;
+		
+		// Declare wxWidgets event table
+		DECLARE_EVENT_TABLE()
+		
+		// IDs for various items
+		enum
+		{
+			SOCKET_ID = 1000
+		};
+};
+
+#endif

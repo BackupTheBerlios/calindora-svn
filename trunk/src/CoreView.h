@@ -1,12 +1,12 @@
 //-----------------------------------------------------------------------------
-// file_template.txt
+// CoreView.h
 //
-// Date:        17 Jul 2004
+// Date:        21 Jul 2004
 // Copyright:   Copyright (C) Jason Lynch 2004
 // Website:     http://calindora.berlios.de
 // Author:      Jason Lynch (aexoden@aexoden.com)
 //-----------------------------------------------------------------------------
-// $Id: $
+// $Id: Calindora.h 7 2004-07-18 03:58:08Z aexoden $
 //-----------------------------------------------------------------------------
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -24,3 +24,18 @@
 //
 // For full license details, see COPYING.
 //-----------------------------------------------------------------------------
+
+#ifndef COREVIEW_H
+#define COREVIEW_H
+
+class Server;
+
+class CoreView
+{
+	public:
+		virtual void onCoreNewServer(Server* server) = 0;
+
+	private:
+};
+
+#endif

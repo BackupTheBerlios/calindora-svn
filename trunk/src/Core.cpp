@@ -1,12 +1,12 @@
 //-----------------------------------------------------------------------------
-// file_template.txt
+// Core.cpp
 //
-// Date:        17 Jul 2004
+// Date:        19 Jul 2004
 // Copyright:   Copyright (C) Jason Lynch 2004
 // Website:     http://calindora.berlios.de
 // Author:      Jason Lynch (aexoden@aexoden.com)
 //-----------------------------------------------------------------------------
-// $Id: $
+// $Id: Calindora.cpp 7 2004-07-18 03:58:08Z aexoden $
 //-----------------------------------------------------------------------------
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -24,3 +24,52 @@
 //
 // For full license details, see COPYING.
 //-----------------------------------------------------------------------------
+
+#include "Core.h"
+
+Core::Core()
+{
+	_serverList = new std::list<Server*>();
+}
+
+Core::~Core()
+{
+	delete _serverList;
+}
+
+void Core::createServer()
+{
+	Server *server = new Server(this);
+	_serverList->push_back(server);
+
+	if (_view != NULL)
+	{
+		_view->onCoreNewServer(server);
+	}
+}
+
+void Core::input(const wxString& input, Server *server)
+{
+	// Received a new input from some context.
+	
+	// Check for a server command
+	if (input.Left(6) == _("server"))
+	{
+		wxIPaddress *address = new wxIPV4address();
+		address->Hostname(_("irc.ffchat.net"));
+		address->Service(6669);
+		
+		server->connect(address);
+	}
+	else
+	{
+		// We don't have anything else to do here at the moment, so we'll send it back down
+		// to the server as a raw command..
+		server->rawCommand(input);
+	}
+}
+
+void Core::setView(CoreView *coreView)
+{
+	_view = coreView;
+}

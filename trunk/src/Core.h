@@ -1,12 +1,12 @@
 //-----------------------------------------------------------------------------
-// file_template.txt
+// Core.h
 //
-// Date:        17 Jul 2004
+// Date:        19 Jul 2004
 // Copyright:   Copyright (C) Jason Lynch 2004
 // Website:     http://calindora.berlios.de
 // Author:      Jason Lynch (aexoden@aexoden.com)
 //-----------------------------------------------------------------------------
-// $Id: $
+// $Id: Calindora.h 7 2004-07-18 03:58:08Z aexoden $
 //-----------------------------------------------------------------------------
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -24,3 +24,36 @@
 //
 // For full license details, see COPYING.
 //-----------------------------------------------------------------------------
+
+#ifndef CORE_H
+#define CORE_H
+
+#include <list>
+
+#include "wx/wx.h"
+#include "config.h"
+
+#include "CoreView.h"
+#include "Server.h"
+
+class Core
+{
+	public:
+		Core();
+		~Core();
+		
+		void createServer();
+		const std::list<Server*> * const getServerList() { return _serverList; }
+		void setView(CoreView *view);
+		
+		// Triggered on input. Indicates the context of the input. For now, just servers, but later
+		// a more elaborate solution will be needed to handle channels or other windows as well.
+		void input(const wxString& input, Server *server);
+		
+	private:
+		std::list<Server*> *_serverList;
+		
+		CoreView *_view;
+};
+
+#endif

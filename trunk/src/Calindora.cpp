@@ -1,10 +1,10 @@
 //-----------------------------------------------------------------------------
 // Calindora.cpp
 //
-// Date:		16 Jul 2004
-// Copyright:	Copyright (C) Jason Lynch 2004
-// Website:		http://calindora.berlios.de
-// Author: 		Jason Lynch (aexoden@aexoden.com)
+// Date:        16 Jul 2004
+// Copyright:   Copyright (C) Jason Lynch 2004
+// Website:     http://calindora.berlios.de
+// Author:      Jason Lynch (aexoden@aexoden.com)
 //-----------------------------------------------------------------------------
 // $Id$
 //-----------------------------------------------------------------------------
@@ -22,23 +22,24 @@
 // with this program; if not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// For full license details, see doc/COPYING.
+// For full license details, see COPYING.
 //-----------------------------------------------------------------------------
 
-#include "wx/wx.h"
-
-#include "config.h"
 #include "Calindora.h"
 
 IMPLEMENT_APP(Calindora)
 
 bool Calindora::OnInit()
 {
-	wxFrame *frame = new wxFrame((wxFrame*) NULL, -1, _("Calindora " VERSION));
-	frame->CreateStatusBar();
-	frame->SetStatusText(_("Calindora IRC Client"));
-	frame->Show(TRUE);
-	SetTopWindow(frame);
-
+	_core = new Core();
+	_frame = new ClientFrame(_core);
+	
+	_core->createServer();
+	
+	_frame->Show(TRUE);
+	SetTopWindow(_frame);
+	
+	// Create a new server
+	
 	return true;
 }

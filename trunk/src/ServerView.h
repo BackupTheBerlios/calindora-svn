@@ -1,12 +1,12 @@
 //-----------------------------------------------------------------------------
-// file_template.txt
+// ServerView.h
 //
-// Date:        17 Jul 2004
+// Date:        21 Jul 2004
 // Copyright:   Copyright (C) Jason Lynch 2004
 // Website:     http://calindora.berlios.de
 // Author:      Jason Lynch (aexoden@aexoden.com)
 //-----------------------------------------------------------------------------
-// $Id: $
+// $Id: Calindora.h 7 2004-07-18 03:58:08Z aexoden $
 //-----------------------------------------------------------------------------
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -24,3 +24,19 @@
 //
 // For full license details, see COPYING.
 //-----------------------------------------------------------------------------
+
+#ifndef SERVERVIEW_H
+#define SERVERVIEW_H
+
+#include "wx/wx.h"
+
+class ServerView
+{
+	public:
+		//virtual ChannelView* newChannelView(Server* server) = 0;
+		virtual void onServerMessage(const wxString& message) = 0;
+		
+	private:
+};
+
+#endif
