@@ -1,8 +1,17 @@
-Copyright (C) 1994, 1995, 1996, 1999, 2000, 2001, 2002 Free Software
-Foundation, Inc.
+Application-Specific Notes
+==========================
 
-   This file is free documentation; the Free Software Foundation gives
-unlimited permission to copy, distribute and modify it.
+   In order to compile Calindora from a release tarball, the following
+libraries are currently required:
+
+   wxWidgets 2.5.2, compiled in Unicode mode. (This means that only GTK2
+      and Microsoft Windows are currently supported.)
+	   
+In order to compile from the Subversion repository, GNU Autotools will
+also be required. This includes Automake 1.8 and Autoconf 2.59.
+
+The wxWidgets installation prefix can be specified with --with-wx-prefix.
+The remaining generic instructions are applicable as always.
 
 Basic Installation
 ==================
