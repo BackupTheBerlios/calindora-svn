@@ -6,7 +6,7 @@
 // Website:     http://calindora.berlios.de
 // Author:      Jason Lynch (aexoden@aexoden.com)
 //-----------------------------------------------------------------------------
-// $Id: Calindora.h 7 2004-07-18 03:58:08Z aexoden $
+// $Id$
 //-----------------------------------------------------------------------------
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -45,6 +45,19 @@ class Core
 		void createServer();
 		const std::list<Server*> * const getServerList() { return _serverList; }
 		void setView(CoreView *view);
+		
+		// Configuration access and setting commands. Anything that wants to set preferences is able to.
+		// This allows the GUI, for example, to provide an interface for setting configuration values.
+		// TODO:
+		// -- Add support for per-server and per-channel configurations.
+		// -- Develop a good configuration hierarchy.
+		// -- Support XML based configuration storage.
+		// -- Provide an interface for working with the configuration hierarchy. For example, different kinds of
+		//    options (yes/no, textbox) and so on, each with defined values. This could allow a GUI to generate
+		//    a configuration dialog on the fly, without needing to know about each option.
+		// -- Add options for configuration detail level, allowing novices to suppress less-used options.
+		wxString getPreference(const wxString& section, const wxString& item);
+		void setPreference(const wxString& section, const wxString& item, const wxString& data);
 		
 		// Triggered on input. Indicates the context of the input. For now, just servers, but later
 		// a more elaborate solution will be needed to handle channels or other windows as well.

@@ -70,7 +70,12 @@ void Server::connect(wxIPaddress *server)
 	
 	_view->onServerMessage(_("Connecting to server..."));
 	
-	if (_socket->WaitOnConnect(10) == true && _socket->IsConnected())
+	long timeout;
+	if (!(_core->getPreference(_("Server"), _("ConnectionTimeout")).ToLong(&timeout, 10)))
+	{
+		timeout = 10;
+	}
+	if (_socket->WaitOnConnect(timeout) == true && _socket->IsConnected())
 	{
 		_view->onServerMessage(_("Successful connection!"));
 		_status = STATUS_CONNECTED;
@@ -114,18 +119,29 @@ void Server::onSocketEvent(wxSocketEvent& event)
 				std::string input;
 				size_t index;
 				_socket->Read(readBuffer, 1024);
+				
+				if (_socket->Error())
+				{
+					wxSocketError error = _socket->LastError();
+					
+					_view->onServerMessage(_("***** A socket I/O error has occured."));
+				}
+				
 				_inputBuffer.append(readBuffer, _socket->LastCount());
 				
 				index = _inputBuffer.find_first_of('\n');
 				while (index != std::string::npos)
 				{
 					// Get the input substring.
-					input = _inputBuffer.substr(0, index-1);
+					input = _inputBuffer.substr(0, index);
 					
 					// Remove any extra carriage returns.
-					while (input[0] == '\r')
+					// RFC 1459 says lines are terminated with a CRLF, but looping safeguards against extra.
+					// May want to add a similar check at the beginning of the string, and change it to completely
+					// eliminate all newline characters. Depends on how well different servers conform.
+					while (input[input.length()-1] == '\r')
 					{
-						input = input.substr(1);
+						input = input.substr(0, input.length() - 1);
 					}
 					
 					// Send the incoming data to the view.
@@ -168,22 +184,32 @@ void Server::rawCommand(const wxString& input)
 {
 	if (_status == STATUS_CONNECTED)
 	{
-		// For now, basic IO. Should eventually make sure the operations succeed.
+		// Convert the input buffer into a UTF-8 multibyte string. More sophisticated character set
+		// handling may eventually be needed.
 		const wxWX2MBbuf buffer = input.mb_str(wxConvUTF8);
 		int byteCount = strlen(buffer);
 		
-		wxString *string = new wxString();
-		string->Printf(_("Writing %d bytes to socket."), byteCount);
-		_view->onServerMessage(*string);
-		delete string;
-		
+		// Write the buffer to the socket and check for an error. Better error handling should be a todo.
 		_socket->Write(buffer, byteCount);
+		if (_socket->Error())
+		{
+			wxSocketError error = _socket->LastError();
+			
+			_view->onServerMessage(_("***** A socket I/O error has occured."));
+		}
+		
+		// Finish the write with a newline. May be more practical to append to the buffer and only write once.
 		_socket->Write("\n", 1);
+		if (_socket->Error())
+		{
+			wxSocketError error = _socket->LastError();
+			
+			_view->onServerMessage(_("***** A socket I/O error has occured."));
+		}
 	}
 	else
 	{
-		// Display an error message, I suppose.
-		_view->onServerMessage(_("Not connected."));
+		_view->onServerMessage(_("Not connected to a server."));
 	}
 }
 

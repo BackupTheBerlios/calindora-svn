@@ -6,7 +6,7 @@
 // Website:     http://calindora.berlios.de
 // Author:      Jason Lynch (aexoden@aexoden.com)
 //-----------------------------------------------------------------------------
-// $Id: Calindora.cpp 7 2004-07-18 03:58:08Z aexoden $
+// $Id$
 //-----------------------------------------------------------------------------
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -26,6 +26,8 @@
 //-----------------------------------------------------------------------------
 
 #include "Core.h"
+
+#include "wx/tokenzr.h"
 
 Core::Core()
 {
@@ -50,16 +52,38 @@ void Core::createServer()
 
 void Core::input(const wxString& input, Server *server)
 {
-	// Received a new input from some context.
-	
-	// Check for a server command
-	if (input.Left(6) == _("server"))
+	// Check for a command.
+	// TODO:
+	// -- May want to detect the prefix as long as only whitespace precedes it.
+	// -- Perhaps make it possible for prefix to be more than a single character.
+	if (input.Left(1) == this->getPreference(_("General"), _("CommandPrefix")))
 	{
-		wxIPaddress *address = new wxIPV4address();
-		address->Hostname(_("irc.ffchat.net"));
-		address->Service(6669);
+		wxArrayString *tokens = new wxArrayString();
 		
-		server->connect(address);
+		wxStringTokenizer tokenizer(input, _(" \t"), wxTOKEN_STRTOK);
+		while (tokenizer.HasMoreTokens())
+		{
+			tokens->Add(tokenizer.GetNextToken());
+		}
+
+		wxString command = (*tokens)[0];
+		command = command.Right(command.length() - 1).MakeLower();
+		
+		if (command == _("server"))
+		{
+			// SERVER <server> <port>
+			wxString hostname = (*tokens)[1];
+			long port;
+			(*tokens)[2].ToLong(&port, 10);
+			
+			wxIPaddress *address = new wxIPV4address();
+			address->Hostname(hostname);
+			address->Service(port);
+			
+			server->connect(address);
+		}
+		
+		delete tokens;
 	}
 	else
 	{
@@ -72,4 +96,29 @@ void Core::input(const wxString& input, Server *server)
 void Core::setView(CoreView *coreView)
 {
 	_view = coreView;
+}
+
+wxString Core::getPreference(const wxString& section, const wxString& item)
+{
+	if (section == _("General"))
+	{
+		if (item == _("CommandPrefix"))
+		{
+				return _("/");
+		}
+	}
+	else if (section == _("Server"))
+	{
+		if (item == _("ConnectionTimeout"))
+		{
+			return _("10"); 
+		}
+	}
+	
+	return _("");
+}
+
+void Core::setPreference(const wxString& section, const wxString& item, const wxString& data)
+{
+	// Do nothing yet
 }

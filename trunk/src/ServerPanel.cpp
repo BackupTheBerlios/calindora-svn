@@ -6,7 +6,7 @@
 // Website:		http://calindora.aexoden.com
 // Author:		Jason Lynch (aexoden@aexoden.com)
 //-----------------------------------------------------------------------------
-// $Id: contentwindow.cpp 6 2004-05-29 02:11:21Z Jason Lynch $
+// $Id$
 //-----------------------------------------------------------------------------
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -61,38 +61,6 @@ void ServerPanel::OnInput(wxCommandEvent &event)
 	_inputControl->Clear();	
 	
 	_server->onInput(text);
-	
-/*
-	if (text.Left(1) == '/')
-	{
-		// We'll invoke the command parser--though for now, we'll just hack in here.
-		int firstSpace = text.Find(' ');
-		wxString command;
-
-		if (firstSpace == -1)
-		{
-			command = text.Mid(1);
-		}
-		else
-		{
-			command = text.Mid(1, firstSpace - 1);
-		}
-
-		if (command == _("server"))
-		{
-			(*_textControl) << _("Connecting to server.") << _("\n");
-		}
-		else
-		{
-			(*_textControl) << _("Invalid command.") << _("\n");
-		}
-	}
-	else
-	{
-		(*_textControl) << _inputControl->GetLineText(0) << _("\n");
-	}
-	
-*/
 }
 
 void ServerPanel::onServerMessage(const wxString& message)
