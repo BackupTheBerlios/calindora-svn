@@ -49,6 +49,7 @@ class Core : public wxFrame
 		
 		// Other various methods.
 		Server* createServer();
+		void processInput(const wxString& input, Server *server);
 		
 	protected:
 		DECLARE_EVENT_TABLE()
@@ -66,18 +67,8 @@ class Core : public wxFrame
 		// Various constants
 		enum
 		{
-			MENU_FILE_EXIT
+			MENU_FILE_EXIT = 1000
 		};
 };
-
-/*
-class Core : public wxFrame
-{
-	public:
-		// Triggered on input. Indicates the context of the input. For now, just servers, but later
-		// a more elaborate solution will be needed to handle channels or other windows as well.
-		void input(const wxString& input, Server *server);		
-};
-*/
 
 #endif

@@ -28,8 +28,11 @@
 #ifndef SERVER_H
 #define SERVER_H
 
+#include <string>
+
 #include <wx/panel.h>
 #include <wx/sizer.h>
+#include <wx/socket.h>
 #include <wx/textctrl.h>
 #include <wx/window.h>
 
@@ -41,12 +44,42 @@ class Server : public wxPanel
 		Server(wxWindow *parent, Core *core);
 		~Server();
 		
+		// wxWidgets event handlers.
+		void OnInput(wxCommandEvent& event);
+		void OnSocketEvent(wxSocketEvent& event);
+		
+		// Socket related methods
+		bool checkSocketError();
+		void connect(wxIPaddress *address);
+		void disconnect();
+		
 	private:
+		// Determines the current state of the socket.
+		int _socketStatus;
+		
+		std::string _inputBuffer;
+	
 		Core *_core;
 		
+		wxIPaddress *_currentAddress;
+		wxSizer *_sizer;
+		wxSocketClient *_socket;
 		wxTextCtrl *_outputControl;
 		wxTextCtrl *_inputControl;
-		wxSizer *_sizer;
+		
+		// Declare the wxWidgets event table.
+		DECLARE_EVENT_TABLE()
+		
+		enum
+		{
+			CONTROL_TEXT_INPUT = 1000,
+			
+			SOCKET_ID,
+			
+			STATUS_DISCONNECTED,
+			STATUS_CONNECTING,
+			STATUS_CONNECTED
+		};
 };
 
 /*
@@ -58,42 +91,13 @@ class Server : public wxPanel
 {
 	public:
 		bool operator== (const Server& right) const;
-		
-		void connect(wxIPaddress *server);
-		void disconnect();
-		void onSocketEvent(wxSocketEvent& event);
-		
-		// Called whenever an associated ServerView receives a new input line.
-		void OnInput(wxCommandEvent& event);
 		void rawCommand(const wxString& input);
 		
 	private:
-		wxSocketClient *_socket;
-		
-		// Using wxIPaddress to presumably pave the way for future IPV6 support.
-		wxIPaddress *_currentServer;
-		
 		// Buffer to hold incoming data until we have a full line.
 		std::string _inputBuffer;		
 		int _status;
 		static int nextID;
-		
-		int _id;
-		
-		// Declare wxWidgets event table
-		DECLARE_EVENT_TABLE()
-		
-		// IDs for various items
-		enum
-		{
-			SOCKET_ID = 1000,
-			
-			STATUS_DISCONNECTED,
-			STATUS_CONNECTING,
-			STATUS_CONNECTED,
-			
-			CONTROL_TEXT_INPUT
-		};
 };
 */
 

@@ -26,6 +26,7 @@
 //-----------------------------------------------------------------------------
 
 #include <wx/wx.h>
+#include <wx/regex.h>
 
 #include "config.h"
 
@@ -78,6 +79,53 @@ Server* Core::createServer()
 	return server;
 }
 
+void Core::processInput(const wxString& input, Server *server)
+{
+	// Check for a command, and process it accordingly.
+	// TODO:
+	// -- Want to delegate this processing to the script engine, when it's eventually put in place.
+	// -- May want to detect the prefix as long as it's only preceded by whitespace.
+	// -- May make it possible for the prefix to be more than one character.
+	// -- Extract the prefix from a preference.
+	if (input.Left(1) == wxT("/"))
+	{
+		wxRegEx re;
+		
+		// SERVER [-n] <server> <port>
+		re.Compile(wxT("/server( (-n))?( ([[:alnum:].-]+))?((:| )([0-9]+))?"));
+		if (re.Matches(input))
+		{
+			if (re.GetMatch(input, 2) == wxT("-n"))
+			{
+				// Create a new server object.
+				server = this->createServer();
+			}
+			
+			wxString hostname = re.GetMatch(input, 4);
+			long port;
+			re.GetMatch(input, 7).ToLong(&port, 10);
+			
+			// We allocate the memory for the address, but the server is responsible for any deletion
+			wxIPaddress *address = new wxIPV4address();
+			address->Hostname(hostname);
+			address->Service(port);
+			
+			server->connect(address);
+			
+			return;
+		}
+		
+		// TODO:
+		// -- Print some kind of error message if the command is invalid.
+	}
+	else
+	{
+		// TODO:
+		// -- Send the command directly to the context as a raw command. This means messages typed in a channel
+		//    will go to that channel. Messages typed in a server window will be sent as raw commands.
+	}
+}
+
 /*
 #include "wx/tokenzr.h"
 #include "wx/regex.h"
@@ -103,39 +151,10 @@ void Core::input(const wxString& input, Server *server)
 		
 		if (command == _("server"))
 		{
-			// SERVER [-n] <server> <port>
-			//wxRegEx reServer(this->getPreference(_("General"), _("CommandPrefix")) + wxT("server( (-n))?( ([[:alnum:].-]+))?((:| )([0-9]+))?"));
 			wxRegEx reServer(wxT("/server( (-n))?( ([[:alnum:].-]+))?((:| )([0-9]+))?"));
-			if (reServer.Matches(input))
-			{
-				if (reServer.GetMatch(input, 2) == wxT("-n"))
-				{
-					// Create a new server object.
-					server = this->createServer();
-				}
-				wxString hostname = reServer.GetMatch(input, 4);
-				long port;
-				reServer.GetMatch(input, 7).ToLong(&port, 10);
-				
-				wxIPaddress *address = new wxIPV4address();
-				address->Hostname(hostname);
-				address->Service(port);
-				
-				server->connect(address);
-			}
-			else
-			{
-				//_view->onServerMessage(_("Invalid command syntax."));	
-			}
 		}
 		
 		delete tokens;
-	}
-	else
-	{
-		// We don't have anything else to do here at the moment, so we'll send it back down
-		// to the server as a raw command..
-		server->rawCommand(input);
 	}
 }
 
