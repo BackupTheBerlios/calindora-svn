@@ -6,7 +6,7 @@
 // Website:     http://calindora.berlios.de
 // Author:      Jason Lynch (aexoden@aexoden.com)
 //-----------------------------------------------------------------------------
-// $Id: Calindora.h 7 2004-07-18 03:58:08Z aexoden $
+// $Id$
 //-----------------------------------------------------------------------------
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -29,6 +29,8 @@
 #define SERVER_H
 
 class Core;
+
+#include <string>
 
 #include "wx/wx.h"
 
@@ -61,7 +63,9 @@ class Server : public wxEvtHandler
 		// Using wxIPaddress to presumably pave the way for future IPV6 support.
 		wxIPaddress *_currentServer;
 		
-		bool _connected;
+		// Buffer to hold incoming data until we have a full line.
+		std::string _inputBuffer;		
+		int _status;
 		static int nextID;
 		
 		ServerView *_view;
@@ -75,7 +79,11 @@ class Server : public wxEvtHandler
 		// IDs for various items
 		enum
 		{
-			SOCKET_ID = 1000
+			SOCKET_ID = 1000,
+			
+			STATUS_DISCONNECTED,
+			STATUS_CONNECTING,
+			STATUS_CONNECTED
 		};
 };
 

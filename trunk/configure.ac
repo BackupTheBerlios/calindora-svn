@@ -27,8 +27,11 @@ fi
 # Checks for header files.
 
 # Checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_STDBOOL
+AC_C_CONST
 
 # Checks for library functions.
+AC_HEADER_STDC
 
 CPPFLAGS="$CPPFLAGS $WX_CPPFLAGS"
 CXXFLAGS="$CXXFLAGS $WX_CXXFLAGS_ONLY -Wall"

@@ -6,7 +6,7 @@
 // Website:     http://calindora.berlios.de
 // Author:      Jason Lynch (aexoden@aexoden.com)
 //-----------------------------------------------------------------------------
-// $Id: Calindora.cpp 7 2004-07-18 03:58:08Z aexoden $
+// $Id$
 //-----------------------------------------------------------------------------
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -48,13 +48,13 @@ Server::Server(Core *core)
 	_socket->SetNotify(wxSOCKET_CONNECTION_FLAG | wxSOCKET_LOST_FLAG | wxSOCKET_INPUT_FLAG | wxSOCKET_OUTPUT_FLAG);
 	_socket->Notify(true);
 	
-	_connected = false;
+	_status = STATUS_DISCONNECTED;
 	_currentServer = NULL;
 }
 
 Server::~Server()
 {
-	delete _socket;
+	_socket->Destroy();
 }
 
 void Server::connect(wxIPaddress *server)
@@ -65,10 +65,21 @@ void Server::connect(wxIPaddress *server)
 	}
 	_currentServer = server;
 
+	_status = STATUS_CONNECTING;
 	_socket->Connect(*_currentServer, false);
 	
-	// Add a message indicating we're connecting.
 	_view->onServerMessage(_("Connecting to server..."));
+	
+	if (_socket->WaitOnConnect(10) == true && _socket->IsConnected())
+	{
+		_view->onServerMessage(_("Successful connection!"));
+		_status = STATUS_CONNECTED;
+	}
+	else
+	{
+		_view->onServerMessage(_("Failed to connect!"));
+		_status = STATUS_DISCONNECTED;
+	}
 }
 
 void Server::disconnect()
@@ -86,23 +97,53 @@ void Server::onSocketEvent(wxSocketEvent& event)
 	switch (event.GetSocketEvent())
 	{
 		case wxSOCKET_CONNECTION:
-			_view->onServerMessage(_("Successfully connected."));
-			_connected = true;
+			// Nothing to handle here.
 			break;
 			
 		case wxSOCKET_LOST:
-			_view->onServerMessage(_("Failed to connect or connection lost."));
-			_connected = false;
+			if (_status != STATUS_CONNECTING)
+			{
+				_view->onServerMessage(_("Connection lost."));
+			}
+			_status = STATUS_DISCONNECTED;
 			break;
 			
 		case wxSOCKET_INPUT:
 			{
-				char* buffer = new char[512];
-				_socket->Read(buffer, 512);
-				wxString *input = new wxString(buffer, wxConvUTF8);
-				_view->onServerMessage(*input);
-				delete input;
-				delete buffer;
+				char readBuffer[1024];
+				std::string input;
+				size_t index;
+				_socket->Read(readBuffer, 1024);
+				_inputBuffer.append(readBuffer, _socket->LastCount());
+				
+				index = _inputBuffer.find_first_of('\n');
+				while (index != std::string::npos)
+				{
+					// Get the input substring.
+					input = _inputBuffer.substr(0, index-1);
+					
+					// Remove any extra carriage returns.
+					while (input[0] == '\r')
+					{
+						input = input.substr(1);
+					}
+					
+					// Send the incoming data to the view.
+					wxString *message = new wxString(input.c_str(), wxConvUTF8);
+					if (message->Len() == 0)
+					{
+						delete message;
+						//wxCSConv *conv = new wxCSConv(_("windows-1252"));
+						message = new wxString(input.c_str(), wxConvISO8859_1);
+						//delete conv;
+					}
+					_view->onServerMessage(*message);
+					delete message;
+					
+					// Alter the input buffer to remove this line.
+					_inputBuffer = _inputBuffer.substr(index + 1);
+					index = _inputBuffer.find_first_of('\n');
+				}
 			}
 			break;
 			
@@ -125,7 +166,7 @@ void Server::onInput(const wxString& input)
 
 void Server::rawCommand(const wxString& input)
 {
-	if (_connected == true)
+	if (_status == STATUS_CONNECTED)
 	{
 		// For now, basic IO. Should eventually make sure the operations succeed.
 		const wxWX2MBbuf buffer = input.mb_str(wxConvUTF8);
